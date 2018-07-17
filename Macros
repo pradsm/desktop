@@ -1,0 +1,187 @@
+
+Sub ReplytoApplicant()
+
+    Dim origEmail As MailItem
+    Dim replyEmail As MailItem
+
+    Set origEmail = Application.ActiveWindow.Selection.Item(1)
+    Set replyEmail = Application.CreateItemFromTemplate("\\VFPS01\Departments\Retail\Human Resources\PostieOppertunities-Template\Auto Reply Postie Oppertunities.oft")
+
+    replyEmail.To = origEmail.Reply.To
+    replyEmail.CC = origEmail.CC
+    
+    replyEmail.HTMLBody = replyEmail.HTMLBody & origEmail.Reply.HTMLBody
+    replyEmail.Recipients.ResolveAll
+    replyEmail.Display
+    
+End Sub
+
+Sub ReplytoApplicantAutoSend()
+
+    Dim origEmail As MailItem
+    Dim replyEmail As MailItem
+
+    Set origEmail = Application.ActiveWindow.Selection.Item(1)
+    Set replyEmail = Application.CreateItemFromTemplate("\\VFPS01\Departments\Retail\Human Resources\PostieOppertunities-Template\Auto Reply Postie Oppertunities.oft")
+
+    replyEmail.To = origEmail.Reply.To
+    replyEmail.CC = origEmail.CC
+        
+    replyEmail.HTMLBody = replyEmail.HTMLBody & origEmail.Reply.HTMLBody
+    replyEmail.Recipients.ResolveAll
+    replyEmail.Send
+    
+End Sub
+
+Sub ReplyFromApplicant()
+
+    Dim origEmail As MailItem
+    Dim replyEmail As MailItem
+
+    Set origEmail = Application.ActiveWindow.Selection.Item(1)
+    Set replyEmail = Application.CreateItemFromTemplate("\\VFPS01\Departments\Retail\Human Resources\PostieOppertunities-Template\Auto Reply Postie Oppertunities.oft")
+
+    replyEmail.To = origEmail.Sender
+    replyEmail.CC = origEmail.CC
+    
+    
+    replyEmail.HTMLBody = replyEmail.HTMLBody & origEmail.Reply.HTMLBody
+    replyEmail.Display
+    
+End Sub
+Sub ReplyFromApplicantAuto()
+
+    Dim origEmail As MailItem
+    Dim replyEmail As MailItem
+
+    Set origEmail = Application.ActiveWindow.Selection.Item(1)
+    Set replyEmail = Application.CreateItemFromTemplate("\\VFPS01\Departments\Retail\Human Resources\PostieOppertunities-Template\Auto Reply Postie Oppertunities.oft")
+
+    replyEmail.To = origEmail.Sender
+    replyEmail.CC = origEmail.CC
+    
+    
+    replyEmail.HTMLBody = replyEmail.HTMLBody & origEmail.Reply.HTMLBody
+    replyEmail.Send
+    
+End Sub
+
+Sub MoveItemsTradeMe()
+ Dim myNameSpace As Outlook.NameSpace
+ Dim myInbox As Outlook.Folder
+ Dim myDestFolder As Outlook.Folder
+ Dim myItems As Outlook.Items
+ Dim myItem As Object
+
+ Set myNameSpace = Application.GetNamespace("MAPI")
+ Set myInbox = myNameSpace.GetDefaultFolder(olFolderInbox)
+ Set myItems = myInbox.Items
+ Set myDestFolder = myInbox.Folders("Postie Opportunities").Folders("Actioned")
+ Set myItem = myItems.Find("[SenderName] = 'Trade Me'")
+ While TypeName(myItem) <> "Nothing"
+ myItem.Move myDestFolder
+ Set myItem = myItems.FindNext
+ Wend
+End Sub
+Sub MoveItemsRobot()
+ Dim myNameSpace As Outlook.NameSpace
+ Dim myInbox As Outlook.Folder
+ Dim myDestFolder As Outlook.Folder
+ Dim myItems As Outlook.Items
+ Dim myItem As Object
+
+ Set myNameSpace = Application.GetNamespace("MAPI")
+ Set myInbox = myNameSpace.GetDefaultFolder(olFolderInbox)
+ Set myItems = myInbox.Items
+ Set myDestFolder = myInbox.Folders("Actioned")
+ Set myItem = myItems.Find("[SenderName] = 'robot@blackpepper.co.nz'")
+ While TypeName(myItem) <> "Nothing"
+ myItem.Move myDestFolder
+ Set myItem = myItems.FindNext
+ Wend
+End Sub
+
+
+Sub MoveItems1ItemActioned()
+ Dim myNameSpace As Outlook.NameSpace
+ Dim myInbox As Outlook.Folder
+ Dim myDestFolder As Outlook.Folder
+ Dim myItems As Outlook.Items
+ Dim myItem As Object
+
+ Set myNameSpace = Application.GetNamespace("MAPI")
+ Set myInbox = myNameSpace.GetDefaultFolder(olFolderInbox)
+ Set myItems = myInbox.Items
+ Set myDestFolder = myInbox.Folders("Postie Opportunities").Folders("Actioned")
+ Set myItem = Application.ActiveWindow.Selection.Item(1)
+ While TypeName(myItem) <> "Nothing"
+ myItem.Move myDestFolder
+ Set myItem = myItems.FindNext
+ Wend
+End Sub
+
+Private Sub myOlItems_ItemAdd(ByVal Item As Object)
+    
+    Dim MsgReply As Outlook.MailItem
+    Set olApp = Outlook.Application
+    Set objMail = olApp.CreateItem(olMailItem)
+         
+    With MsgReply
+        .To = Item.SenderName
+        .Subject = "Re " & Item.Subject
+        .HTMLBody = "<span style=""font-family : verdana;font-size : 10pt""><p>Hello " & .To & " <p><p><p> Thank you for contacting the Support Centre <p><p><p> Your email has been received with the description of: " & Item.Subject & "  </p></span>" & .HTMLBody
+        .Send
+    End With
+    
+     
+    Set olApp = Nothing
+    Set objMail = Nothing
+End Sub
+
+Option Explicit
+
+Sub AutoReply(olItem As Outlook.MailItem)
+Dim olOutMail As Outlook.MailItem
+    With olItem
+        Set olOutMail = olItem.Reply
+        With olOutMail
+            .Body = "This is the reply text"
+            .Send
+         End With
+        Set olOutMail = Nothing
+    End With
+End Sub
+
+Sub Test()
+Dim olMsg As MailItem
+On Error Resume Next
+Set olMsg = ActiveExplorer.Selection.Item(1)
+AutoReply olMsg
+End Sub
+
+
+
+Sub AutoReply(olItem As Outlook.MailItem)
+Dim olOutMail As Outlook.MailItem
+Dim oTemp As Outlook.MailItem
+Dim fso As Object
+    Set fso = CreateObject("Scripting.FileSystemObject")
+            Set oTemp = CreateItemFromTemplate("\\VFPS01\Departments\Retail\Human Resources\PostieOppertunities-Template\Auto Reply Postie Oppertunities.oft")
+        With olItem
+            Set olOutMail = olItem.Reply
+            With olOutMail
+                .HTMLBody = oTemp.HTMLBody
+                .Send
+            End With
+            Set olOutMail = Nothing
+        End With
+        oTemp.Close olDiscard
+    
+End Sub
+
+Sub Test()
+Dim olMsg As MailItem
+On Error Resume Next
+Set olMsg = ActiveExplorer.Selection.Item(1)
+AutoReply olMsg
+End Sub
